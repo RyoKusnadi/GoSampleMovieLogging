@@ -8,6 +8,21 @@ import (
 	"strings"
 )
 
+func CreateSuccessApiResponse(result interface{}) domain.ApiResponse {
+	return domain.ApiResponse{
+		Result: result,
+	}
+}
+
+func CreateDefaultErrorApiResponse(code int, message string) domain.ApiResponse {
+	return domain.ApiResponse{
+		Error: &domain.ErrorResponse{
+			Code:    code,
+			Message: message,
+		},
+	}
+}
+
 func DecodeResponse(statusCode int, response []byte, successStruct interface{}, successExcludeFields map[string]bool, errorStruct interface{}, errorField string) domain.ApiResponse {
 	if statusCode == http.StatusOK {
 		if err := json.Unmarshal(response, &successStruct); err != nil {
