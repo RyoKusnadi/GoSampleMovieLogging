@@ -18,19 +18,24 @@ type MovieUsecase struct {
 	HTTPClient *infrastructure.HTTPClient
 }
 
-func (uc *MovieUsecase) GetMovies() ([]domain.Movie, error) {
+func (uc *MovieUsecase) GetMovies() domain.Response {
 	endpoint := TMDB_BASE_URL + TMDB_MOVIE_URL
 	response, err := uc.HTTPClient.HTTPRequest(http.MethodGet, endpoint, "")
 	if err != nil {
-		return nil, err
+		return domain.CreateErrorResponse(http.StatusBadRequest, err.Error())
 	}
 
 	var commonResp infrastructure.CommonResponse
 	if err := json.Unmarshal(response, &commonResp); err != nil {
-		return nil, err
+		return domain.CreateErrorResponse(http.StatusBadRequest, err.Error())
 	}
 
-	return convertToMovies(commonResp.Results)
+	movieList, err := convertToMovies(commonResp.Results)
+	if err != nil {
+		return domain.CreateErrorResponse(http.StatusBadRequest, err.Error())
+	}
+
+	return domain.CreateSuccessResponse(movieList)
 }
 
 func convertToMovies(data []interface{}) (domain.MovieList, error) {

@@ -1,7 +1,7 @@
 package adapter
 
 import (
-	"net/http"
+	"scalable-go-movie/adapter/utils"
 	"scalable-go-movie/usecase"
 
 	"github.com/gin-gonic/gin"
@@ -22,11 +22,5 @@ func (a *HTTPAdapter) RegisterRoutes(router *gin.Engine) {
 }
 
 func (a *HTTPAdapter) GetMovieHandler(c *gin.Context) {
-	movieList, err := a.MovieUsecase.GetMovies()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"movie_data": movieList})
+	utils.MarshalAndSendResponse(c, a.MovieUsecase.GetMovies())
 }
