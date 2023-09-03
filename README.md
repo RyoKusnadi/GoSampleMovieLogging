@@ -1,5 +1,9 @@
 # Scalable Go Movie
 
+## Requirements:
+
+- Golang 1.21
+
 ## Description:
 
 A robust and scalable movie data processing system that leverages concurrent programming, GraphQL for CRUD operations, Kafka for asynchronous communication, and the Onion architecture pattern for modularity. Incorporate Docker for containerization and Kubernetes for orchestration, ensuring seamless deployment and scalability.
