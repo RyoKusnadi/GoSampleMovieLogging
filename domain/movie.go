@@ -1,5 +1,18 @@
 package domain
 
+type TMDBSuccessCommonResponse struct {
+	Page         int           `json:"page,omitempty"`
+	Results      []interface{} `json:"results,omitempty"`
+	TotalPages   int           `json:"total_pages,omitempty"`
+	TotalResults int           `json:"total_results,omitempty"`
+}
+
+type TMDBErrorCommonResponse struct {
+	StatusCode    int    `json:"status_code"`
+	StatusMessage string `json:"status_message"`
+	Success       bool   `json:"success"`
+}
+
 type Movie struct {
 	Adult            bool    `json:"adult"`
 	BackdropPath     string  `json:"backdrop_path"`
@@ -16,5 +29,3 @@ type Movie struct {
 	VoteAverage      float64 `json:"vote_average"`
 	VoteCount        int     `json:"vote_count"`
 }
-
-type MovieList []Movie

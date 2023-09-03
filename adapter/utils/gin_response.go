@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func MarshalAndSendResponse(c *gin.Context, response domain.Response) {
+func MarshalAndSendResponse(c *gin.Context, response domain.ApiResponse) {
 	status := http.StatusOK
 
 	if response.Error != nil {

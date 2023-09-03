@@ -11,13 +11,6 @@ const (
 	DEFAULT_TIMEOUT = 10 * time.Second
 )
 
-type CommonResponse struct {
-	Page         int           `json:"page"`
-	Results      []interface{} `json:"results"`
-	TotalPages   int           `json:"total_pages"`
-	TotalResults int           `json:"total_results"`
-}
-
 type HTTPClient struct {
 	Client         *http.Client
 	Timeout        time.Duration
