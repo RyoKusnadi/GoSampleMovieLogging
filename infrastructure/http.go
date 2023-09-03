@@ -40,14 +40,14 @@ func (c *HTTPClient) SetRequestHeaders(headers map[string]string) {
 	c.RequestHeaders = headers
 }
 
-func (c *HTTPClient) HTTPRequest(method, url, body string) ([]byte, error) {
+func (c *HTTPClient) HTTPRequest(method, url, body string) (statusCode int, responseBody []byte, err error) {
 	if !isValidHTTPMethod(method) {
-		return nil, fmt.Errorf("invalid HTTP method: %s", method)
+		return http.StatusBadRequest, nil, fmt.Errorf("invalid HTTP method: %s", method)
 	}
 
 	req, err := http.NewRequest(method, url, nil)
 	if err != nil {
-		return nil, err
+		return http.StatusBadRequest, nil, err
 	}
 
 	for key, value := range c.RequestHeaders {
@@ -58,16 +58,16 @@ func (c *HTTPClient) HTTPRequest(method, url, body string) ([]byte, error) {
 
 	response, err := c.Client.Do(req)
 	if err != nil {
-		return nil, err
+		return http.StatusBadRequest, nil, err
 	}
 	defer response.Body.Close()
 
-	responseBody, err := io.ReadAll(response.Body)
+	responseBody, err = io.ReadAll(response.Body)
 	if err != nil {
-		return nil, err
+		return http.StatusBadRequest, nil, err
 	}
 
-	return responseBody, nil
+	return response.StatusCode, responseBody, nil
 }
 
 func isValidHTTPMethod(method string) bool {

@@ -20,7 +20,7 @@ type MovieUsecase struct {
 
 func (uc *MovieUsecase) GetMovies() domain.Response {
 	endpoint := TMDB_BASE_URL + TMDB_MOVIE_URL
-	response, err := uc.HTTPClient.HTTPRequest(http.MethodGet, endpoint, "")
+	_, response, err := uc.HTTPClient.HTTPRequest(http.MethodGet, endpoint, "")
 	if err != nil {
 		return domain.CreateErrorResponse(http.StatusBadRequest, err.Error())
 	}
