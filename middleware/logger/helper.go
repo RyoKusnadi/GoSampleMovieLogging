@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 const (
@@ -27,7 +27,18 @@ func (rl *RequestLogger) DetermineHttpLogLevel(status int) slog.Level {
 	}
 }
 
-func (rl *RequestLogger) LogWithContext(c *gin.Context, level slog.Level, msg string, attrs ...slog.Attr) {
+func (rl *RequestLogger) GenerateRequestID() (string, error) {
+	if rl.Config.WithRequestID {
+		id, err := uuid.NewRandom()
+		if err != nil {
+			return "", err
+		}
+		return id.String(), nil
+	}
+	return "", nil
+}
+
+func (rl *RequestLogger) WriteLogIntoTxt(level slog.Level, msg string, attrs ...slog.Attr) {
 	if rl.Config.EnableWriteTxtLog {
 		logFileDir, ok := rl.Config.LogFilePaths[level]
 		if !ok || logFileDir == "" {
@@ -46,6 +57,4 @@ func (rl *RequestLogger) LogWithContext(c *gin.Context, level slog.Level, msg st
 			file.WriteString(logLine)
 		}
 	}
-
-	rl.Logger.LogAttrs(c, level, msg, attrs...)
 }

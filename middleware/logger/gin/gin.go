@@ -1,14 +1,12 @@
 package gin
 
 import (
+	"log/slog"
 	"time"
 
-	"log/slog"
+	"github.com/gin-gonic/gin"
 
 	"scalable-go-movie/middleware/logger"
-
-	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 type GinRequestLogger struct {
@@ -26,7 +24,7 @@ func (grl *GinRequestLogger) Middleware() gin.HandlerFunc {
 		start := time.Now()
 		path := c.Request.URL.Path
 
-		requestID, _ := grl.generateRequestID(c)
+		requestID, _ := grl.RequestLogger.GenerateRequestID()
 		grl.setHeader(c, requestID)
 
 		defer func() {
@@ -35,22 +33,11 @@ func (grl *GinRequestLogger) Middleware() gin.HandlerFunc {
 
 			level := grl.RequestLogger.DetermineHttpLogLevel(c.Writer.Status())
 			attrs := grl.buildAttributes(c, path, requestID, latency, level)
-			grl.RequestLogger.LogWithContext(c, level, "request:", attrs...)
+			grl.LogWithContext(c, level, "request:", attrs...)
 		}()
 
 		c.Next()
 	}
-}
-
-func (rl *GinRequestLogger) generateRequestID(c *gin.Context) (string, error) {
-	if rl.Config.WithRequestID {
-		id, err := uuid.NewRandom()
-		if err != nil {
-			return "", err
-		}
-		return id.String(), nil
-	}
-	return "", nil
 }
 
 func (rl *GinRequestLogger) setHeader(c *gin.Context, requestID string) {
@@ -59,7 +46,7 @@ func (rl *GinRequestLogger) setHeader(c *gin.Context, requestID string) {
 	}
 }
 
-func (rl *GinRequestLogger) buildAttributes(c *gin.Context, path, requestID string, latency time.Duration, level slog.Level) []slog.Attr {
+func (grl *GinRequestLogger) buildAttributes(c *gin.Context, path, requestID string, latency time.Duration, level slog.Level) []slog.Attr {
 	attrs := []slog.Attr{
 		slog.Int("status", c.Writer.Status()),
 		slog.String("method", c.Request.Method),
@@ -68,9 +55,14 @@ func (rl *GinRequestLogger) buildAttributes(c *gin.Context, path, requestID stri
 		slog.String("user-agent", c.Request.UserAgent()),
 	}
 
-	if rl.Config.WithRequestID {
+	if grl.Config.WithRequestID {
 		attrs = append(attrs, slog.String("request-id", requestID))
 	}
 
 	return attrs
+}
+
+func (grl *GinRequestLogger) LogWithContext(c *gin.Context, level slog.Level, msg string, attrs ...slog.Attr) {
+	grl.RequestLogger.WriteLogIntoTxt(level, msg, attrs...)
+	grl.Logger.LogAttrs(c, level, msg, attrs...)
 }
