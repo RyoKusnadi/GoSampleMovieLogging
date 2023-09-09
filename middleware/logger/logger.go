@@ -10,11 +10,11 @@ type Config struct {
 	LogFilePaths      map[slog.Level]string
 	EnableWriteTxtLog bool
 	CustomLogLevels   []slog.Level
-	Grayscale         GrayscaleConfig
+	GrayScale         GrayScaleConfig
 	mu                sync.Mutex
 }
 
-type GrayscaleConfig struct {
+type GrayScaleConfig struct {
 	Enabled          bool
 	Threshold        int
 	Percentage       int
