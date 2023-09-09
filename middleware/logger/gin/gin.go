@@ -66,3 +66,10 @@ func (grl *GinRequestLogger) LogWithContext(c *gin.Context, level slog.Level, ms
 	grl.RequestLogger.WriteLogIntoTxt(level, msg, attrs...)
 	grl.Logger.LogAttrs(c, level, msg, attrs...)
 }
+
+func (rl *GinRequestLogger) GetRequestID(c *gin.Context) string {
+	if rl.Config.WithRequestID {
+		return c.GetHeader("X-Request-ID")
+	}
+	return ""
+}
