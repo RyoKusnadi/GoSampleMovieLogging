@@ -9,8 +9,12 @@ type AttributeBuilder struct {
 	attrs []slog.Attr
 }
 
-func NewAttributeBuilder() *AttributeBuilder {
-	return &AttributeBuilder{}
+func NewAttributeBuilder(RequestId string) *AttributeBuilder {
+	return &AttributeBuilder{
+		[]slog.Attr{
+			slog.String("request-id", RequestId),
+		},
+	}
 }
 
 func (b *AttributeBuilder) WithString(key string, value string) *AttributeBuilder {
