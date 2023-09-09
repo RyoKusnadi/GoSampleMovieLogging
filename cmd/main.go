@@ -10,7 +10,8 @@ import (
 
 	"scalable-go-movie/adapter"
 	"scalable-go-movie/infrastructure"
-	"scalable-go-movie/middleware"
+	"scalable-go-movie/middleware/logger"
+	ginRequestRecorder "scalable-go-movie/middleware/logger/gin"
 	"scalable-go-movie/usecase"
 )
 
@@ -32,11 +33,16 @@ func main() {
 
 	router := gin.New()
 
-	requestRecorder := middleware.NewRequestLogger(
+	requestLogger, err := logger.NewRequestLogger(
 		slog.New(slog.NewJSONHandler(os.Stdout, nil)),
-		middleware.WithRequestID(),
-	).Middleware()
-	router.Use(requestRecorder)
+		logger.WithRequestID(),
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	ginRequestRecorderMiddleware := ginRequestRecorder.NewGinRequestLogger(requestLogger).Middleware()
+	router.Use(ginRequestRecorderMiddleware)
 
 	httpAdapter.RegisterRoutes(router)
 	router.Run(":8080")
