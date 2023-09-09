@@ -9,7 +9,17 @@ type Config struct {
 	WithRequestID     bool
 	LogFilePaths      map[slog.Level]string
 	EnableWriteTxtLog bool
+	CustomLogLevels   []slog.Level
+	Grayscale         GrayscaleConfig
 	mu                sync.Mutex
+}
+
+type GrayscaleConfig struct {
+	Enabled          bool
+	Threshold        int
+	Percentage       int
+	TotalRequests    int
+	TotalRequestsMux sync.Mutex
 }
 
 type RequestLogger struct {
