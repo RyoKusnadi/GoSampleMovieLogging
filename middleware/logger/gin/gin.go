@@ -47,18 +47,17 @@ func (rl *GinRequestLogger) setHeader(c *gin.Context, requestID string) {
 }
 
 func (grl *GinRequestLogger) buildAttributes(c *gin.Context, path, requestID string, latency time.Duration, level slog.Level) []slog.Attr {
-	attrs := []slog.Attr{
-		slog.Int("status", c.Writer.Status()),
-		slog.String("method", c.Request.Method),
-		slog.String("path", path),
-		slog.Duration("latency", latency),
-		slog.String("user-agent", c.Request.UserAgent()),
-	}
-
+	var GinRequestID string
 	if grl.Config.WithRequestID {
-		attrs = append(attrs, slog.String("request-id", requestID))
+		GinRequestID = requestID
 	}
-
+	attrs := logger.NewAttributeBuilder(GinRequestID).
+		WithInt("status", c.Writer.Status()).
+		WithString("method", c.Request.Method).
+		WithString("path", path).
+		WithDuration("latency", latency).
+		WithString("user-agent", c.Request.UserAgent()).
+		Build()
 	return attrs
 }
 
