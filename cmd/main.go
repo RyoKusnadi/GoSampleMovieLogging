@@ -1,14 +1,13 @@
 package main
 
 import (
-	"fmt"
 	"log/slog"
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 
 	"scalable-go-movie/adapter"
+	"scalable-go-movie/config"
 	"scalable-go-movie/infrastructure"
 	"scalable-go-movie/middleware/logger"
 	ginRequestRecorder "scalable-go-movie/middleware/logger/gin"
@@ -16,14 +15,10 @@ import (
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		fmt.Println("Error loading .env file")
-		return
-	}
-	apiKey := os.Getenv("API_KEY")
+	sysConfig := config.Get()
 
 	headers := map[string]string{
-		"Authorization": "Bearer " + apiKey,
+		"Authorization": "Bearer " + sysConfig.MovieApi.Token,
 		"accept":        "application/json",
 	}
 	httpClient := infrastructure.NewHTTPClient()
