@@ -19,6 +19,19 @@ type Config struct {
 	MovieApi struct {
 		Token string `mapstructure:"TOKEN"`
 	} `mapstructure:"MOVIE_API"`
+
+	Logger struct {
+		WithRequestID     bool           `mapstructure:"WITH_REQUEST_ID"`
+		LogFilePath       map[int]string `mapstructure:"LOG_FILE_PATH"`
+		EnableWriteTxtLog bool           `mapstructure:"ENABLE_WRITE_TXT_LOG"`
+		CustomLogLevels   []int          `mapstructure:"CUSTOM_LOG_LEVELS"`
+		GrayScale         *struct {
+			Enabled       bool `mapstructure:"ENABLED"`
+			Threshold     int  `mapstructure:"THRESHOLD"`
+			Percentage    int  `mapstructure:"PERCENTAGE"`
+			TotalRequests int  `mapstructure:"TOTAL_REQUESTS"`
+		} `mapstructure:"GRAY_SCALE"`
+	} `mapstructure:"LOGGER"`
 }
 
 func Get() Config {

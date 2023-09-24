@@ -28,9 +28,43 @@ func main() {
 
 	router := gin.New()
 
+	logOptions := make([]logger.Option, 0)
+	loggerConfig := config.Get().Logger
+	if !loggerConfig.WithRequestID {
+		logOptions = append(logOptions, logger.WithRequestID())
+	}
+	if loggerConfig.LogFilePath != nil {
+		logFilePath := make(map[slog.Level]string)
+		for level, path := range loggerConfig.LogFilePath {
+			slogLevel := slog.Level(level)
+			logFilePath[slogLevel] = path
+		}
+		logOptions = append(logOptions, logger.WithLogFilePaths(logFilePath))
+	}
+	if loggerConfig.EnableWriteTxtLog != false {
+		logOptions = append(logOptions, logger.WithEnableWriteTxtLog())
+	}
+	if loggerConfig.CustomLogLevels != nil {
+		customLevelLogs := make([]slog.Level, 0)
+		for _, customLogLevel := range loggerConfig.CustomLogLevels {
+			slogLevel := slog.Level(customLogLevel)
+			customLevelLogs = append(customLevelLogs, slogLevel)
+		}
+		logOptions = append(logOptions, logger.WithCustomLevelLogs(customLevelLogs))
+	}
+	if loggerConfig.GrayScale != nil {
+		grayScaleConfig := logger.GrayScaleConfig{
+			Enabled:       loggerConfig.GrayScale.Enabled,
+			Threshold:     loggerConfig.GrayScale.Threshold,
+			Percentage:    loggerConfig.GrayScale.Percentage,
+			TotalRequests: loggerConfig.GrayScale.TotalRequests,
+		}
+		logOptions = append(logOptions, logger.WithGrayScale(&grayScaleConfig))
+	}
+
 	requestLogger, err := logger.NewRequestLogger(
 		slog.New(slog.NewJSONHandler(os.Stdout, nil)),
-		logger.WithRequestID(),
+		logOptions...,
 	)
 	if err != nil {
 		panic(err)

@@ -10,7 +10,7 @@ type Config struct {
 	LogFilePaths      map[slog.Level]string
 	EnableWriteTxtLog bool
 	CustomLogLevels   []slog.Level
-	GrayScale         GrayScaleConfig
+	GrayScale         *GrayScaleConfig
 	mu                sync.Mutex
 }
 
@@ -35,15 +35,27 @@ func WithRequestID() Option {
 	}
 }
 
-func WithEnableWriteTxtLog(enable bool) Option {
+func WithEnableWriteTxtLog() Option {
 	return func(rl *RequestLogger) {
-		rl.Config.EnableWriteTxtLog = enable
+		rl.Config.EnableWriteTxtLog = true
 	}
 }
 
 func WithLogFilePaths(logFilePaths map[slog.Level]string) Option {
 	return func(rl *RequestLogger) {
 		rl.Config.LogFilePaths = logFilePaths
+	}
+}
+
+func WithCustomLevelLogs(customLevelLog []slog.Level) Option {
+	return func(rl *RequestLogger) {
+		rl.Config.CustomLogLevels = customLevelLog
+	}
+}
+
+func WithGrayScale(grayScaleConfig *GrayScaleConfig) Option {
+	return func(rl *RequestLogger) {
+		rl.Config.GrayScale = grayScaleConfig
 	}
 }
 
